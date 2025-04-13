@@ -1,0 +1,371 @@
+2025-04-13 14:09:51,920 - feature_extraction - INFO - Logging initialized at level: INFO
+2025-04-13 14:09:51,921 - feature_extraction - INFO - Starting feature extraction for dataset/S0603-M3-Rose_Garden-UTM16N-1m.asc
+2025-04-13 14:09:51,921 - feature_extraction - INFO - Enabled feature groups: ['spatial']
+2025-04-13 14:09:52,019 - feature_extraction - INFO - Loading raster data from dataset/S0603-M3-Rose_Garden-UTM16N-1m.asc
+2025-04-13 14:09:52,019 - feature_extraction.raster_features.core.io - INFO - Loading raster from dataset/S0603-M3-Rose_Garden-UTM16N-1m.asc
+2025-04-13 14:09:52,072 - feature_extraction.raster_features.core.io - INFO - Loaded raster with shape (768, 896), 439792 valid cells
+2025-04-13 14:09:52,072 - feature_extraction - INFO - Calculating coordinates
+2025-04-13 14:09:52,318 - feature_extraction - INFO - Creating base dataframe
+2025-04-13 14:09:52,326 - feature_extraction - INFO - Extracting spatial autocorrelation features
+2025-04-13 14:09:52,585 - feature_extraction.raster_features.features.spatial - INFO - Extracting spatial autocorrelation features
+2025-04-13 14:10:15,420 - feature_extraction - INFO - Logging initialized at level: INFO
+2025-04-13 14:10:15,421 - feature_extraction - INFO - Starting feature extraction for dataset/S0603-M3-Rose_Garden-UTM16N-1m.asc
+2025-04-13 14:10:15,421 - feature_extraction - INFO - Enabled feature groups: ['texture']
+2025-04-13 14:10:15,542 - feature_extraction - INFO - Loading raster data from dataset/S0603-M3-Rose_Garden-UTM16N-1m.asc
+2025-04-13 14:10:15,542 - feature_extraction.raster_features.core.io - INFO - Loading raster from dataset/S0603-M3-Rose_Garden-UTM16N-1m.asc
+2025-04-13 14:10:15,628 - feature_extraction.raster_features.core.io - INFO - Loaded raster with shape (768, 896), 439792 valid cells
+2025-04-13 14:10:15,629 - feature_extraction - INFO - Calculating coordinates
+2025-04-13 14:10:15,911 - feature_extraction - INFO - Creating base dataframe
+2025-04-13 14:10:15,917 - feature_extraction - INFO - Extracting texture features
+2025-04-13 14:10:50,179 - feature_extraction - ERROR - Error during feature extraction: cannot import name 'greycomatrix' from 'skimage.feature' (/opt/miniconda3/envs/raster_features/lib/python3.9/site-packages/skimage/feature/__init__.py)
+Traceback (most recent call last):
+  File "/Users/marco/Documents/PROJECTS_2025/Elena_2025/raster_features/cli.py", line 188, in main
+    from raster_features.features.texture import extract_texture_features
+  File "/Users/marco/Documents/PROJECTS_2025/Elena_2025/raster_features/features/texture.py", line 13, in <module>
+    from skimage.feature import greycomatrix, greycoprops, local_binary_pattern
+ImportError: cannot import name 'greycomatrix' from 'skimage.feature' (/opt/miniconda3/envs/raster_features/lib/python3.9/site-packages/skimage/feature/__init__.py)
+2025-04-13 14:10:50,571 - feature_extraction - INFO - Logging initialized at level: INFO
+2025-04-13 14:10:50,572 - feature_extraction - INFO - Starting feature extraction for dataset/S0603-M3-Rose_Garden-UTM16N-1m.asc
+2025-04-13 14:10:50,572 - feature_extraction - INFO - Enabled feature groups: ['spectral']
+2025-04-13 14:10:50,662 - feature_extraction - INFO - Loading raster data from dataset/S0603-M3-Rose_Garden-UTM16N-1m.asc
+2025-04-13 14:10:50,663 - feature_extraction.raster_features.core.io - INFO - Loading raster from dataset/S0603-M3-Rose_Garden-UTM16N-1m.asc
+2025-04-13 14:10:50,741 - feature_extraction.raster_features.core.io - INFO - Loaded raster with shape (768, 896), 439792 valid cells
+2025-04-13 14:10:50,741 - feature_extraction - INFO - Calculating coordinates
+2025-04-13 14:10:50,987 - feature_extraction - INFO - Creating base dataframe
+2025-04-13 14:10:50,994 - feature_extraction - INFO - Extracting spectral features
+2025-04-13 14:10:53,975 - feature_extraction.raster_features.features.spectral - INFO - Extracting spectral features
+2025-04-13 14:10:55,460 - feature_extraction.raster_features.features.spectral - INFO - Extracted 15 spectral features
+2025-04-13 14:10:55,473 - feature_extraction - INFO - Exporting features to results/S0603-M3-Rose_Garden-UTM16N-1m_spectral_features.csv
+2025-04-13 14:10:55,609 - feature_extraction.raster_features.core.io - INFO - Exporting 439792 rows in 44 chunks of size 10000
+2025-04-13 14:11:01,270 - feature_extraction - INFO - Saving metadata
+2025-04-13 14:11:01,276 - feature_extraction.raster_features.core.io - INFO - Saved metadata to results/S0603-M3-Rose_Garden-UTM16N-1m_spectral_features.json
+2025-04-13 14:11:01,276 - feature_extraction - INFO - Feature extraction completed in 10.70 seconds
+2025-04-13 14:11:01,276 - feature_extraction - INFO - Extracted 19 features for 439792 valid cells
+2025-04-13 14:11:01,677 - feature_extraction - INFO - Logging initialized at level: INFO
+2025-04-13 14:11:01,677 - feature_extraction - INFO - Starting feature extraction for dataset/S0603-M3-Rose_Garden-UTM16N-1m.asc
+2025-04-13 14:11:01,678 - feature_extraction - INFO - Enabled feature groups: ['hydrology']
+2025-04-13 14:11:01,762 - feature_extraction - INFO - Loading raster data from dataset/S0603-M3-Rose_Garden-UTM16N-1m.asc
+2025-04-13 14:11:01,762 - feature_extraction.raster_features.core.io - INFO - Loading raster from dataset/S0603-M3-Rose_Garden-UTM16N-1m.asc
+2025-04-13 14:11:01,813 - feature_extraction.raster_features.core.io - INFO - Loaded raster with shape (768, 896), 439792 valid cells
+2025-04-13 14:11:01,813 - feature_extraction - INFO - Calculating coordinates
+2025-04-13 14:11:02,058 - feature_extraction - INFO - Creating base dataframe
+2025-04-13 14:11:02,066 - feature_extraction - INFO - Extracting hydrological features
+2025-04-13 14:11:06,557 - feature_extraction.raster_features.features.hydrology - INFO - Extracting hydrological features
+2025-04-13 14:13:09,357 - feature_extraction.raster_features.features.hydrology - INFO - Extracted 9 hydrological features
+2025-04-13 14:13:09,370 - feature_extraction - INFO - Exporting features to results/S0603-M3-Rose_Garden-UTM16N-1m_hydrology_features.csv
+2025-04-13 14:13:09,428 - feature_extraction.raster_features.core.io - INFO - Exporting 439792 rows in 44 chunks of size 10000
+2025-04-13 14:13:12,477 - feature_extraction - INFO - Saving metadata
+2025-04-13 14:13:12,483 - feature_extraction.raster_features.core.io - INFO - Saved metadata to results/S0603-M3-Rose_Garden-UTM16N-1m_hydrology_features.json
+2025-04-13 14:13:12,483 - feature_extraction - INFO - Feature extraction completed in 130.81 seconds
+2025-04-13 14:13:12,483 - feature_extraction - INFO - Extracted 13 features for 439792 valid cells
+2025-04-13 14:13:12,883 - feature_extraction - INFO - Logging initialized at level: INFO
+2025-04-13 14:13:12,883 - feature_extraction - INFO - Starting feature extraction for dataset/S0603-M3-Rose_Garden-UTM16N-1m.asc
+2025-04-13 14:13:12,884 - feature_extraction - INFO - Enabled feature groups: ['ml']
+2025-04-13 14:13:12,968 - feature_extraction - INFO - Loading raster data from dataset/S0603-M3-Rose_Garden-UTM16N-1m.asc
+2025-04-13 14:13:12,968 - feature_extraction.raster_features.core.io - INFO - Loading raster from dataset/S0603-M3-Rose_Garden-UTM16N-1m.asc
+2025-04-13 14:13:13,019 - feature_extraction.raster_features.core.io - INFO - Loaded raster with shape (768, 896), 439792 valid cells
+2025-04-13 14:13:13,019 - feature_extraction - INFO - Calculating coordinates
+2025-04-13 14:13:13,265 - feature_extraction - INFO - Creating base dataframe
+2025-04-13 14:13:13,273 - feature_extraction - INFO - Extracting machine learning features
+2025-04-13 14:13:25,613 - feature_extraction - ERROR - Error during feature extraction: name 'nn' is not defined
+Traceback (most recent call last):
+  File "/Users/marco/Documents/PROJECTS_2025/Elena_2025/raster_features/cli.py", line 209, in main
+    from raster_features.features.ml import extract_ml_features
+  File "/Users/marco/Documents/PROJECTS_2025/Elena_2025/raster_features/features/ml.py", line 286, in <module>
+    class SimpleAutoencoder(nn.Module):
+NameError: name 'nn' is not defined
+2025-04-13 14:17:47,813 - feature_extraction - INFO - Logging initialized at level: INFO
+2025-04-13 14:17:47,813 - feature_extraction - INFO - Starting feature extraction for dataset/S0603-M3-Rose_Garden-UTM16N-1m.asc
+2025-04-13 14:17:47,814 - feature_extraction - INFO - Enabled feature groups: ['terrain']
+2025-04-13 14:17:47,902 - feature_extraction - INFO - Loading raster data from dataset/S0603-M3-Rose_Garden-UTM16N-1m.asc
+2025-04-13 14:17:47,902 - feature_extraction.raster_features.core.io - INFO - Loading raster from dataset/S0603-M3-Rose_Garden-UTM16N-1m.asc
+2025-04-13 14:17:47,953 - feature_extraction.raster_features.core.io - INFO - Loaded raster with shape (768, 896), 439792 valid cells
+2025-04-13 14:17:47,953 - feature_extraction - INFO - Calculating coordinates
+2025-04-13 14:17:48,202 - feature_extraction - INFO - Creating base dataframe
+2025-04-13 14:17:48,209 - feature_extraction - INFO - Extracting terrain features
+2025-04-13 14:17:48,394 - feature_extraction.raster_features.features.terrain - WARNING - Cell size is zero or None. Setting to default value of 1.0 to prevent division by zero.
+2025-04-13 14:17:48,394 - feature_extraction.raster_features.features.terrain - INFO - Extracting terrain features with cell size 1.0
+2025-04-13 14:18:22,535 - feature_extraction.raster_features.features.terrain - INFO - Extracted 8 terrain features
+2025-04-13 14:18:22,543 - feature_extraction - INFO - Exporting features to results/S0603-M3-Rose_Garden-UTM16N-1m_terrain_features.csv
+2025-04-13 14:18:22,599 - feature_extraction.raster_features.core.io - INFO - Exporting 439792 rows in 44 chunks of size 10000
+2025-04-13 14:18:26,353 - feature_extraction - INFO - Saving metadata
+2025-04-13 14:18:26,358 - feature_extraction.raster_features.core.io - INFO - Saved metadata to results/S0603-M3-Rose_Garden-UTM16N-1m_terrain_features.json
+2025-04-13 14:18:26,358 - feature_extraction - INFO - Feature extraction completed in 38.54 seconds
+2025-04-13 14:18:26,358 - feature_extraction - INFO - Extracted 12 features for 439792 valid cells
+2025-04-13 14:18:28,839 - feature_extraction - INFO - Logging initialized at level: INFO
+2025-04-13 14:18:28,840 - feature_extraction - INFO - Starting feature extraction for dataset/S0603-M3-Rose_Garden-UTM16N-1m.asc
+2025-04-13 14:18:28,840 - feature_extraction - INFO - Enabled feature groups: ['stats']
+2025-04-13 14:18:28,944 - feature_extraction - INFO - Loading raster data from dataset/S0603-M3-Rose_Garden-UTM16N-1m.asc
+2025-04-13 14:18:28,944 - feature_extraction.raster_features.core.io - INFO - Loading raster from dataset/S0603-M3-Rose_Garden-UTM16N-1m.asc
+2025-04-13 14:18:28,994 - feature_extraction.raster_features.core.io - INFO - Loaded raster with shape (768, 896), 439792 valid cells
+2025-04-13 14:18:28,994 - feature_extraction - INFO - Calculating coordinates
+2025-04-13 14:18:29,240 - feature_extraction - INFO - Creating base dataframe
+2025-04-13 14:18:29,249 - feature_extraction - INFO - Extracting statistical features
+2025-04-13 14:18:29,860 - feature_extraction.raster_features.features.stats - INFO - Extracting statistical features with window size 5
+2025-04-13 14:27:45,543 - feature_extraction.raster_features.features.stats - INFO - Extracted 9 statistical features
+2025-04-13 14:27:45,553 - feature_extraction - INFO - Exporting features to results/S0603-M3-Rose_Garden-UTM16N-1m_stats_features.csv
+2025-04-13 14:27:45,609 - feature_extraction.raster_features.core.io - INFO - Exporting 439792 rows in 44 chunks of size 10000
+2025-04-13 14:27:49,235 - feature_extraction - INFO - Saving metadata
+2025-04-13 14:27:49,240 - feature_extraction.raster_features.core.io - INFO - Saved metadata to results/S0603-M3-Rose_Garden-UTM16N-1m_stats_features.json
+2025-04-13 14:27:49,240 - feature_extraction - INFO - Feature extraction completed in 560.40 seconds
+2025-04-13 14:27:49,240 - feature_extraction - INFO - Extracted 13 features for 439792 valid cells
+2025-04-13 14:27:51,836 - feature_extraction - INFO - Logging initialized at level: INFO
+2025-04-13 14:27:51,837 - feature_extraction - INFO - Starting feature extraction for dataset/S0603-M3-Rose_Garden-UTM16N-1m.asc
+2025-04-13 14:27:51,837 - feature_extraction - INFO - Enabled feature groups: ['spatial']
+2025-04-13 14:27:52,198 - feature_extraction - INFO - Loading raster data from dataset/S0603-M3-Rose_Garden-UTM16N-1m.asc
+2025-04-13 14:27:52,198 - feature_extraction.raster_features.core.io - INFO - Loading raster from dataset/S0603-M3-Rose_Garden-UTM16N-1m.asc
+2025-04-13 14:27:52,253 - feature_extraction.raster_features.core.io - INFO - Loaded raster with shape (768, 896), 439792 valid cells
+2025-04-13 14:27:52,253 - feature_extraction - INFO - Calculating coordinates
+2025-04-13 14:27:52,501 - feature_extraction - INFO - Creating base dataframe
+2025-04-13 14:27:52,510 - feature_extraction - INFO - Extracting spatial autocorrelation features
+2025-04-13 14:27:52,781 - feature_extraction.raster_features.features.spatial - INFO - Extracting spatial autocorrelation features
+2025-04-13 14:27:52,781 - feature_extraction.raster_features.features.spatial - WARNING - Large raster detected (768x896). Using memory-efficient settings.
+2025-04-13 14:27:53,628 - feature_extraction - ERROR - Error during feature extraction: dimension mismatch
+Traceback (most recent call last):
+  File "/Users/marco/Documents/PROJECTS_2025/Elena_2025/raster_features/cli.py", line 183, in main
+    spatial_features = extract_spatial_features(raster_data)
+  File "/Users/marco/Documents/PROJECTS_2025/Elena_2025/raster_features/utils/utils.py", line 46, in wrapper
+    result = func(*args, **kwargs)
+  File "/Users/marco/Documents/PROJECTS_2025/Elena_2025/raster_features/features/spatial.py", line 735, in extract_spatial_features
+    global_moran = calculate_global_moran(elevation, weights, mask)
+  File "/Users/marco/Documents/PROJECTS_2025/Elena_2025/raster_features/features/spatial.py", line 320, in calculate_global_moran
+    numerator = z @ weights @ z
+  File "/opt/miniconda3/envs/raster_features/lib/python3.9/site-packages/scipy/sparse/_base.py", line 701, in __rmatmul__
+    return self._rmatmul_dispatch(other)
+  File "/opt/miniconda3/envs/raster_features/lib/python3.9/site-packages/scipy/sparse/_base.py", line 682, in _rmatmul_dispatch
+    ret = self.transpose()._matmul_dispatch(tr)
+  File "/opt/miniconda3/envs/raster_features/lib/python3.9/site-packages/scipy/sparse/_base.py", line 624, in _matmul_dispatch
+    raise ValueError('dimension mismatch')
+ValueError: dimension mismatch
+2025-04-13 14:27:56,026 - feature_extraction - INFO - Logging initialized at level: INFO
+2025-04-13 14:27:56,027 - feature_extraction - INFO - Starting feature extraction for dataset/S0603-M3-Rose_Garden-UTM16N-1m.asc
+2025-04-13 14:27:56,027 - feature_extraction - INFO - Enabled feature groups: ['texture']
+2025-04-13 14:27:56,114 - feature_extraction - INFO - Loading raster data from dataset/S0603-M3-Rose_Garden-UTM16N-1m.asc
+2025-04-13 14:27:56,115 - feature_extraction.raster_features.core.io - INFO - Loading raster from dataset/S0603-M3-Rose_Garden-UTM16N-1m.asc
+2025-04-13 14:27:56,166 - feature_extraction.raster_features.core.io - INFO - Loaded raster with shape (768, 896), 439792 valid cells
+2025-04-13 14:27:56,166 - feature_extraction - INFO - Calculating coordinates
+2025-04-13 14:27:56,412 - feature_extraction - INFO - Creating base dataframe
+2025-04-13 14:27:56,418 - feature_extraction - INFO - Extracting texture features
+2025-04-13 14:27:57,404 - feature_extraction.raster_features.features.texture - INFO - Extracting texture features with window size 5
+2025-04-13 14:29:35,450 - feature_extraction.raster_features.features.texture - INFO - Extracted 11 texture features
+2025-04-13 14:29:35,465 - feature_extraction - INFO - Exporting features to results/S0603-M3-Rose_Garden-UTM16N-1m_texture_features.csv
+2025-04-13 14:29:35,540 - feature_extraction.raster_features.core.io - INFO - Exporting 439792 rows in 44 chunks of size 10000
+2025-04-13 14:29:39,165 - feature_extraction - INFO - Saving metadata
+2025-04-13 14:29:39,170 - feature_extraction.raster_features.core.io - INFO - Saved metadata to results/S0603-M3-Rose_Garden-UTM16N-1m_texture_features.json
+2025-04-13 14:29:39,171 - feature_extraction - INFO - Feature extraction completed in 103.14 seconds
+2025-04-13 14:29:39,171 - feature_extraction - INFO - Extracted 15 features for 439792 valid cells
+2025-04-13 14:29:41,689 - feature_extraction - INFO - Logging initialized at level: INFO
+2025-04-13 14:29:41,690 - feature_extraction - INFO - Starting feature extraction for dataset/S0603-M3-Rose_Garden-UTM16N-1m.asc
+2025-04-13 14:29:41,690 - feature_extraction - INFO - Enabled feature groups: ['spectral']
+2025-04-13 14:29:41,789 - feature_extraction - INFO - Loading raster data from dataset/S0603-M3-Rose_Garden-UTM16N-1m.asc
+2025-04-13 14:29:41,789 - feature_extraction.raster_features.core.io - INFO - Loading raster from dataset/S0603-M3-Rose_Garden-UTM16N-1m.asc
+2025-04-13 14:29:41,841 - feature_extraction.raster_features.core.io - INFO - Loaded raster with shape (768, 896), 439792 valid cells
+2025-04-13 14:29:41,842 - feature_extraction - INFO - Calculating coordinates
+2025-04-13 14:29:42,092 - feature_extraction - INFO - Creating base dataframe
+2025-04-13 14:29:42,098 - feature_extraction - INFO - Extracting spectral features
+2025-04-13 14:29:42,813 - feature_extraction.raster_features.features.spectral - INFO - Extracting spectral features
+2025-04-13 14:29:44,279 - feature_extraction.raster_features.features.spectral - INFO - Extracted 15 spectral features
+2025-04-13 14:29:44,289 - feature_extraction - INFO - Exporting features to results/S0603-M3-Rose_Garden-UTM16N-1m_spectral_features.csv
+2025-04-13 14:29:44,368 - feature_extraction.raster_features.core.io - INFO - Exporting 439792 rows in 44 chunks of size 10000
+2025-04-13 14:29:49,765 - feature_extraction - INFO - Saving metadata
+2025-04-13 14:29:49,771 - feature_extraction.raster_features.core.io - INFO - Saved metadata to results/S0603-M3-Rose_Garden-UTM16N-1m_spectral_features.json
+2025-04-13 14:29:49,771 - feature_extraction - INFO - Feature extraction completed in 8.08 seconds
+2025-04-13 14:29:49,771 - feature_extraction - INFO - Extracted 19 features for 439792 valid cells
+2025-04-13 14:29:52,309 - feature_extraction - INFO - Logging initialized at level: INFO
+2025-04-13 14:29:52,310 - feature_extraction - INFO - Starting feature extraction for dataset/S0603-M3-Rose_Garden-UTM16N-1m.asc
+2025-04-13 14:29:52,310 - feature_extraction - INFO - Enabled feature groups: ['hydrology']
+2025-04-13 14:29:52,411 - feature_extraction - INFO - Loading raster data from dataset/S0603-M3-Rose_Garden-UTM16N-1m.asc
+2025-04-13 14:29:52,411 - feature_extraction.raster_features.core.io - INFO - Loading raster from dataset/S0603-M3-Rose_Garden-UTM16N-1m.asc
+2025-04-13 14:29:52,462 - feature_extraction.raster_features.core.io - INFO - Loaded raster with shape (768, 896), 439792 valid cells
+2025-04-13 14:29:52,462 - feature_extraction - INFO - Calculating coordinates
+2025-04-13 14:29:52,710 - feature_extraction - INFO - Creating base dataframe
+2025-04-13 14:29:52,716 - feature_extraction - INFO - Extracting hydrological features
+2025-04-13 14:29:53,329 - feature_extraction.raster_features.features.hydrology - INFO - Extracting hydrological features
+2025-04-13 14:32:01,291 - feature_extraction.raster_features.features.hydrology - INFO - Extracted 9 hydrological features
+2025-04-13 14:32:01,303 - feature_extraction - INFO - Exporting features to results/S0603-M3-Rose_Garden-UTM16N-1m_hydrology_features.csv
+2025-04-13 14:32:01,357 - feature_extraction.raster_features.core.io - INFO - Exporting 439792 rows in 44 chunks of size 10000
+2025-04-13 14:32:04,113 - feature_extraction - INFO - Saving metadata
+2025-04-13 14:32:04,118 - feature_extraction.raster_features.core.io - INFO - Saved metadata to results/S0603-M3-Rose_Garden-UTM16N-1m_hydrology_features.json
+2025-04-13 14:32:04,118 - feature_extraction - INFO - Feature extraction completed in 131.81 seconds
+2025-04-13 14:32:04,118 - feature_extraction - INFO - Extracted 13 features for 439792 valid cells
+2025-04-13 14:32:06,676 - feature_extraction - INFO - Logging initialized at level: INFO
+2025-04-13 14:32:06,677 - feature_extraction - INFO - Starting feature extraction for dataset/S0603-M3-Rose_Garden-UTM16N-1m.asc
+2025-04-13 14:32:06,677 - feature_extraction - INFO - Enabled feature groups: ['ml']
+2025-04-13 14:32:06,778 - feature_extraction - INFO - Loading raster data from dataset/S0603-M3-Rose_Garden-UTM16N-1m.asc
+2025-04-13 14:32:06,778 - feature_extraction.raster_features.core.io - INFO - Loading raster from dataset/S0603-M3-Rose_Garden-UTM16N-1m.asc
+2025-04-13 14:32:06,831 - feature_extraction.raster_features.core.io - INFO - Loaded raster with shape (768, 896), 439792 valid cells
+2025-04-13 14:32:06,831 - feature_extraction - INFO - Calculating coordinates
+2025-04-13 14:32:07,079 - feature_extraction - INFO - Creating base dataframe
+2025-04-13 14:32:07,085 - feature_extraction - INFO - Extracting machine learning features
+2025-04-13 14:32:08,187 - feature_extraction.raster_features.features.ml - INFO - Extracting machine learning features
+2025-04-13 14:32:15,886 - feature_extraction.raster_features.features.ml - INFO - Extracted 3 machine learning features
+2025-04-13 14:32:15,890 - feature_extraction - INFO - Exporting features to results/S0603-M3-Rose_Garden-UTM16N-1m_ml_features.csv
+2025-04-13 14:32:15,970 - feature_extraction.raster_features.core.io - INFO - Exporting 439792 rows in 44 chunks of size 10000
+2025-04-13 14:32:17,807 - feature_extraction - INFO - Saving metadata
+2025-04-13 14:32:17,813 - feature_extraction.raster_features.core.io - INFO - Saved metadata to results/S0603-M3-Rose_Garden-UTM16N-1m_ml_features.json
+2025-04-13 14:32:17,813 - feature_extraction - INFO - Feature extraction completed in 11.14 seconds
+2025-04-13 14:32:17,813 - feature_extraction - INFO - Extracted 7 features for 439792 valid cells
+2025-04-13 14:46:03,307 - feature_extraction - INFO - Logging initialized at level: INFO
+2025-04-13 14:47:08,629 - feature_extraction - INFO - Logging initialized at level: INFO
+2025-04-13 14:47:08,631 - feature_extraction - INFO - Starting feature extraction for dataset/S0603-M3-Rose_Garden-UTM16N-1m.asc
+2025-04-13 14:47:08,631 - feature_extraction - INFO - Enabled feature groups: ['spatial']
+2025-04-13 14:47:14,965 - feature_extraction - ERROR - Error during feature extraction: No module named '_gdal'
+Traceback (most recent call last):
+  File "/opt/miniconda3/lib/python3.12/site-packages/osgeo/__init__.py", line 30, in swig_import_helper
+    return importlib.import_module(mname)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/miniconda3/lib/python3.12/importlib/__init__.py", line 90, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<frozen importlib._bootstrap>", line 1387, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 1331, in _find_and_load_unlocked
+  File "<frozen importlib._bootstrap>", line 921, in _load_unlocked
+  File "<frozen importlib._bootstrap>", line 813, in module_from_spec
+  File "<frozen importlib._bootstrap_external>", line 1293, in create_module
+  File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed
+ImportError: dlopen(/opt/miniconda3/lib/python3.12/site-packages/osgeo/_gdal.cpython-312-darwin.so, 0x0002): Symbol not found: _sqlite3_enable_load_extension
+  Referenced from: <6208DD86-5188-3CF7-867A-14CF69D0D2FE> /opt/miniconda3/lib/libgdal.32.3.6.2.dylib
+  Expected in:     <03A3F0E0-3898-360D-8138-2A6E0E43CC70> /usr/lib/libsqlite3.dylib
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/marco/Documents/PROJECTS_2025/Elena_2025/raster_features/cli.py", line 133, in main
+    from raster_features.core.io import load_raster, export_features, save_metadata
+  File "/Users/marco/Documents/PROJECTS_2025/Elena_2025/raster_features/core/io.py", line 15, in <module>
+    from osgeo import gdal
+  File "/opt/miniconda3/lib/python3.12/site-packages/osgeo/__init__.py", line 46, in <module>
+    _gdal = swig_import_helper()
+            ^^^^^^^^^^^^^^^^^^^^
+  File "/opt/miniconda3/lib/python3.12/site-packages/osgeo/__init__.py", line 43, in swig_import_helper
+    return importlib.import_module('_gdal')
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/miniconda3/lib/python3.12/importlib/__init__.py", line 90, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ModuleNotFoundError: No module named '_gdal'
+2025-04-13 14:47:38,807 - feature_extraction - INFO - Logging initialized at level: INFO
+2025-04-13 14:52:17,938 - feature_extraction - INFO - Logging initialized at level: INFO
+2025-04-13 14:52:17,939 - feature_extraction - INFO - Starting feature extraction for dataset/S0603-M3-Rose_Garden-UTM16N-1m.asc
+2025-04-13 14:52:17,939 - feature_extraction - INFO - Enabled feature groups: ['spatial']
+2025-04-13 14:52:18,603 - feature_extraction - INFO - Loading raster data from dataset/S0603-M3-Rose_Garden-UTM16N-1m.asc
+2025-04-13 14:52:18,603 - feature_extraction.raster_features.core.io - INFO - Loading raster from dataset/S0603-M3-Rose_Garden-UTM16N-1m.asc
+2025-04-13 14:52:18,816 - feature_extraction.raster_features.core.io - INFO - Loaded raster with shape (768, 896), 439792 valid cells
+2025-04-13 14:52:18,816 - feature_extraction - INFO - Calculating coordinates
+2025-04-13 14:52:19,412 - feature_extraction - INFO - Creating base dataframe
+2025-04-13 14:52:19,428 - feature_extraction - INFO - Extracting spatial autocorrelation features
+2025-04-13 14:52:19,858 - feature_extraction.raster_features.features.spatial - INFO - Extracting spatial autocorrelation features
+2025-04-13 14:52:19,858 - feature_extraction.raster_features.features.spatial - WARNING - Large raster detected (768x896). Using memory-efficient settings.
+2025-04-13 14:55:58,107 - feature_extraction - INFO - Logging initialized at level: INFO
+2025-04-13 14:55:58,108 - feature_extraction - INFO - Starting feature extraction for dataset/S0603-M3-Rose_Garden-UTM16N-1m.asc
+2025-04-13 14:55:58,108 - feature_extraction - INFO - Enabled feature groups: ['spatial']
+2025-04-13 14:55:58,372 - feature_extraction - INFO - Loading raster data from dataset/S0603-M3-Rose_Garden-UTM16N-1m.asc
+2025-04-13 14:55:58,372 - feature_extraction.raster_features.core.io - INFO - Loading raster from dataset/S0603-M3-Rose_Garden-UTM16N-1m.asc
+2025-04-13 14:55:58,434 - feature_extraction.raster_features.core.io - INFO - Loaded raster with shape (768, 896), 439792 valid cells
+2025-04-13 14:55:58,435 - feature_extraction - INFO - Calculating coordinates
+2025-04-13 14:55:58,705 - feature_extraction - INFO - Creating base dataframe
+2025-04-13 14:55:58,719 - feature_extraction - INFO - Extracting spatial autocorrelation features
+2025-04-13 14:55:59,067 - feature_extraction.raster_features.features.spatial - INFO - Extracting spatial autocorrelation features
+2025-04-13 14:55:59,067 - feature_extraction.raster_features.features.spatial - WARNING - Large raster detected (768x896). Using memory-efficient settings.
+2025-04-13 14:57:45,406 - feature_extraction - INFO - Logging initialized at level: INFO
+2025-04-13 14:57:45,407 - feature_extraction - INFO - Starting feature extraction for dataset/S0603-M3-Rose_Garden-UTM16N-1m.asc
+2025-04-13 14:57:45,407 - feature_extraction - INFO - Enabled feature groups: ['terrain']
+2025-04-13 14:57:45,538 - feature_extraction - INFO - Loading raster data from dataset/S0603-M3-Rose_Garden-UTM16N-1m.asc
+2025-04-13 14:57:45,538 - feature_extraction.raster_features.core.io - INFO - Loading raster from dataset/S0603-M3-Rose_Garden-UTM16N-1m.asc
+2025-04-13 14:57:45,595 - feature_extraction.raster_features.core.io - INFO - Loaded raster with shape (768, 896), 439792 valid cells
+2025-04-13 14:57:45,595 - feature_extraction - INFO - Calculating coordinates
+2025-04-13 14:57:45,840 - feature_extraction - INFO - Creating base dataframe
+2025-04-13 14:57:45,850 - feature_extraction - INFO - Extracting terrain features
+2025-04-13 14:57:46,146 - feature_extraction.raster_features.features.terrain - WARNING - Cell size is zero or None. Setting to default value of 1.0 to prevent division by zero.
+2025-04-13 14:57:46,147 - feature_extraction.raster_features.features.terrain - INFO - Extracting terrain features with cell size 1.0
+2025-04-13 14:58:20,265 - feature_extraction.raster_features.features.terrain - INFO - Extracted 8 terrain features
+2025-04-13 14:58:20,271 - feature_extraction - INFO - Exporting features to results/S0603-M3-Rose_Garden-UTM16N-1m_terrain_features.csv
+2025-04-13 14:58:20,334 - feature_extraction.raster_features.core.io - INFO - Exporting 439792 rows in 44 chunks of size 10000
+2025-04-13 14:58:24,346 - feature_extraction - INFO - Saving metadata
+2025-04-13 14:58:24,353 - feature_extraction.raster_features.core.io - INFO - Saved metadata to results/S0603-M3-Rose_Garden-UTM16N-1m_terrain_features.json
+2025-04-13 14:58:24,353 - feature_extraction - INFO - Feature extraction completed in 38.95 seconds
+2025-04-13 14:58:24,353 - feature_extraction - INFO - Extracted 12 features for 439792 valid cells
+2025-04-13 14:58:26,917 - feature_extraction - INFO - Logging initialized at level: INFO
+2025-04-13 14:58:26,918 - feature_extraction - INFO - Starting feature extraction for dataset/S0603-M3-Rose_Garden-UTM16N-1m.asc
+2025-04-13 14:58:26,918 - feature_extraction - INFO - Enabled feature groups: ['stats']
+2025-04-13 14:58:27,034 - feature_extraction - INFO - Loading raster data from dataset/S0603-M3-Rose_Garden-UTM16N-1m.asc
+2025-04-13 14:58:27,034 - feature_extraction.raster_features.core.io - INFO - Loading raster from dataset/S0603-M3-Rose_Garden-UTM16N-1m.asc
+2025-04-13 14:58:27,086 - feature_extraction.raster_features.core.io - INFO - Loaded raster with shape (768, 896), 439792 valid cells
+2025-04-13 14:58:27,086 - feature_extraction - INFO - Calculating coordinates
+2025-04-13 14:58:27,330 - feature_extraction - INFO - Creating base dataframe
+2025-04-13 14:58:27,345 - feature_extraction - INFO - Extracting statistical features
+2025-04-13 14:58:28,054 - feature_extraction.raster_features.features.stats - INFO - Extracting statistical features with window size 5
+2025-04-13 15:07:42,671 - feature_extraction.raster_features.features.stats - INFO - Extracted 9 statistical features
+2025-04-13 15:07:42,681 - feature_extraction - INFO - Exporting features to results/S0603-M3-Rose_Garden-UTM16N-1m_stats_features.csv
+2025-04-13 15:07:42,738 - feature_extraction.raster_features.core.io - INFO - Exporting 439792 rows in 44 chunks of size 10000
+2025-04-13 15:07:46,380 - feature_extraction - INFO - Saving metadata
+2025-04-13 15:07:46,385 - feature_extraction.raster_features.core.io - INFO - Saved metadata to results/S0603-M3-Rose_Garden-UTM16N-1m_stats_features.json
+2025-04-13 15:07:46,385 - feature_extraction - INFO - Feature extraction completed in 559.47 seconds
+2025-04-13 15:07:46,385 - feature_extraction - INFO - Extracted 13 features for 439792 valid cells
+2025-04-13 15:07:48,968 - feature_extraction - INFO - Logging initialized at level: INFO
+2025-04-13 15:07:48,969 - feature_extraction - INFO - Starting feature extraction for dataset/S0603-M3-Rose_Garden-UTM16N-1m.asc
+2025-04-13 15:07:48,969 - feature_extraction - INFO - Enabled feature groups: ['spatial']
+2025-04-13 15:07:49,083 - feature_extraction - INFO - Loading raster data from dataset/S0603-M3-Rose_Garden-UTM16N-1m.asc
+2025-04-13 15:07:49,083 - feature_extraction.raster_features.core.io - INFO - Loading raster from dataset/S0603-M3-Rose_Garden-UTM16N-1m.asc
+2025-04-13 15:07:49,136 - feature_extraction.raster_features.core.io - INFO - Loaded raster with shape (768, 896), 439792 valid cells
+2025-04-13 15:07:49,136 - feature_extraction - INFO - Calculating coordinates
+2025-04-13 15:07:49,382 - feature_extraction - INFO - Creating base dataframe
+2025-04-13 15:07:49,394 - feature_extraction - INFO - Extracting spatial autocorrelation features
+2025-04-13 15:07:49,671 - feature_extraction.raster_features.features.spatial - INFO - Extracting spatial autocorrelation features
+2025-04-13 15:07:49,671 - feature_extraction.raster_features.features.spatial - WARNING - Large raster detected (768x896). Using memory-efficient settings.
+2025-04-13 15:59:43,169 - feature_extraction - INFO - Logging initialized at level: INFO
+2025-04-13 15:59:43,170 - feature_extraction - INFO - Starting feature extraction for dataset/S0603-M3-Rose_Garden-UTM16N-1m.asc
+2025-04-13 15:59:43,170 - feature_extraction - INFO - Enabled feature groups: ['spatial']
+2025-04-13 15:59:43,441 - feature_extraction - INFO - Loading raster data from dataset/S0603-M3-Rose_Garden-UTM16N-1m.asc
+2025-04-13 15:59:43,441 - feature_extraction.raster_features.core.io - INFO - Loading raster from dataset/S0603-M3-Rose_Garden-UTM16N-1m.asc
+2025-04-13 15:59:43,499 - feature_extraction.raster_features.core.io - INFO - Loaded raster with shape (768, 896), 439792 valid cells
+2025-04-13 15:59:43,499 - feature_extraction - INFO - Calculating coordinates
+2025-04-13 15:59:43,748 - feature_extraction - INFO - Creating base dataframe
+2025-04-13 15:59:43,759 - feature_extraction - INFO - Extracting spatial autocorrelation features
+2025-04-13 15:59:44,125 - feature_extraction.raster_features.features.spatial - INFO - Extracting spatial autocorrelation features
+2025-04-13 15:59:44,125 - feature_extraction.raster_features.features.spatial - WARNING - Large raster detected (768x896). Using memory-efficient settings.
+2025-04-13 16:12:32,895 - feature_extraction - INFO - Logging initialized at level: INFO
+2025-04-13 16:12:32,896 - feature_extraction - INFO - Starting feature extraction for dataset/S0603-M3-Rose_Garden-UTM16N-1m.asc
+2025-04-13 16:12:32,896 - feature_extraction - INFO - Enabled feature groups: ['spectral']
+2025-04-13 16:12:32,996 - feature_extraction - INFO - Loading raster data from dataset/S0603-M3-Rose_Garden-UTM16N-1m.asc
+2025-04-13 16:12:32,996 - feature_extraction.raster_features.core.io - INFO - Loading raster from dataset/S0603-M3-Rose_Garden-UTM16N-1m.asc
+2025-04-13 16:12:33,051 - feature_extraction.raster_features.core.io - INFO - Loaded raster with shape (768, 896), 439792 valid cells
+2025-04-13 16:12:33,051 - feature_extraction - INFO - Calculating coordinates
+2025-04-13 16:12:33,300 - feature_extraction - INFO - Creating base dataframe
+2025-04-13 16:12:33,308 - feature_extraction - INFO - Extracting spectral features
+2025-04-13 16:12:34,100 - feature_extraction.raster_features.features.spectral - INFO - Extracting spectral features
+2025-04-13 16:12:35,579 - feature_extraction.raster_features.features.spectral - INFO - Extracted 16 spectral features
+2025-04-13 16:12:35,589 - feature_extraction - INFO - Exporting features to results/S0603-M3-Rose_Garden-UTM16N-1m_spectral_features.csv
+2025-04-13 16:12:35,673 - feature_extraction.raster_features.core.io - INFO - Exporting 439792 rows in 44 chunks of size 10000
+2025-04-13 16:12:41,554 - feature_extraction - INFO - Saving metadata
+2025-04-13 16:12:41,561 - feature_extraction.raster_features.core.io - INFO - Saved metadata to results/S0603-M3-Rose_Garden-UTM16N-1m_spectral_features.json
+2025-04-13 16:12:41,561 - feature_extraction - INFO - Feature extraction completed in 8.66 seconds
+2025-04-13 16:12:41,561 - feature_extraction - INFO - Extracted 20 features for 439792 valid cells
+2025-04-13 16:29:22,281 - feature_extraction - INFO - Logging initialized at level: INFO
+2025-04-13 16:29:22,282 - feature_extraction - INFO - Starting feature extraction for dataset/S0603-M3-Rose_Garden-UTM16N-1m.asc
+2025-04-13 16:29:22,282 - feature_extraction - INFO - Enabled feature groups: ['spectral']
+2025-04-13 16:29:22,504 - feature_extraction - INFO - Loading raster data from dataset/S0603-M3-Rose_Garden-UTM16N-1m.asc
+2025-04-13 16:29:22,504 - feature_extraction.raster_features.core.io - INFO - Loading raster from dataset/S0603-M3-Rose_Garden-UTM16N-1m.asc
+2025-04-13 16:29:22,560 - feature_extraction.raster_features.core.io - INFO - Loaded raster with shape (768, 896), 439792 valid cells
+2025-04-13 16:29:22,560 - feature_extraction - INFO - Calculating coordinates
+2025-04-13 16:29:22,807 - feature_extraction - INFO - Creating base dataframe
+2025-04-13 16:29:22,815 - feature_extraction - INFO - Extracting spectral features
+2025-04-13 16:29:23,576 - feature_extraction.raster_features.features.spectral - INFO - Extracting spectral features
+2025-04-13 16:34:57,441 - feature_extraction - INFO - Logging initialized at level: INFO
+2025-04-13 16:34:57,442 - feature_extraction - INFO - Starting feature extraction for dataset/S0603-M3-Rose_Garden-UTM16N-1m.asc
+2025-04-13 16:34:57,442 - feature_extraction - INFO - Enabled feature groups: ['spectral']
+2025-04-13 16:34:57,541 - feature_extraction - INFO - Loading raster data from dataset/S0603-M3-Rose_Garden-UTM16N-1m.asc
+2025-04-13 16:34:57,541 - feature_extraction.raster_features.core.io - INFO - Loading raster from dataset/S0603-M3-Rose_Garden-UTM16N-1m.asc
+2025-04-13 16:34:57,592 - feature_extraction.raster_features.core.io - INFO - Loaded raster with shape (768, 896), 439792 valid cells
+2025-04-13 16:34:57,592 - feature_extraction - INFO - Calculating coordinates
+2025-04-13 16:34:57,837 - feature_extraction - INFO - Creating base dataframe
+2025-04-13 16:34:57,843 - feature_extraction - INFO - Extracting spectral features
+2025-04-13 16:34:58,417 - feature_extraction.raster_features.features.spectral - INFO - Extracting spectral features
+2025-04-13 16:46:08,525 - feature_extraction.raster_features.features.spectral - INFO - Extracted 20 spectral features
+2025-04-13 16:46:08,549 - feature_extraction - INFO - Exporting features to results/S0603-M3-Rose_Garden-UTM16N-1m_spectral_features.csv
+2025-04-13 16:46:08,663 - feature_extraction.raster_features.core.io - INFO - Exporting 439792 rows in 44 chunks of size 10000
+2025-04-13 16:46:15,926 - feature_extraction - INFO - Saving metadata
+2025-04-13 16:46:15,933 - feature_extraction.raster_features.core.io - INFO - Saved metadata to results/S0603-M3-Rose_Garden-UTM16N-1m_spectral_features.json
+2025-04-13 16:46:15,933 - feature_extraction - INFO - Feature extraction completed in 678.49 seconds
+2025-04-13 16:46:15,933 - feature_extraction - INFO - Extracted 24 features for 439792 valid cells
