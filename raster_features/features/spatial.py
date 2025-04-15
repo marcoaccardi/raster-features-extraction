@@ -731,35 +731,68 @@ def extract_spatial_features(
     rows, cols = elevation.shape
     n_cells = rows * cols
     
+    # Initialize downsampling factor
+    downsample_factor = 1
+    original_shape = elevation.shape
+    
     # Check if this is a large raster and adjust settings accordingly
-    if n_cells > 500000:  # More than ~700x700 cells
-        logger.warning(f"Large raster detected ({rows}x{cols}). Using memory-efficient settings.")
-        # Adjust spatial config for large rasters
+    if n_cells > 1000000:  # More than ~1000x1000 cells
+        logger.warning(f"Very large raster detected ({rows}x{cols}). Using aggressive downsampling (factor=4).")
+        downsample_factor = 4
         weights_type = 'rook'  # Use rook instead of queen to save memory
-        calculate_local = False  # Disable local indicators to save memory
+        calculate_local = SPATIAL_CONFIG.get('calculate_local', True)  # Allow local but with downsampling
+    elif n_cells > 500000:  # More than ~700x700 cells
+        logger.warning(f"Large raster detected ({rows}x{cols}). Using downsampling (factor=2).")
+        downsample_factor = 2
+        weights_type = 'rook'  # Use rook instead of queen to save memory
+        calculate_local = SPATIAL_CONFIG.get('calculate_local', True)  # Allow local but with downsampling
     else:
         # Use configured settings
         weights_type = SPATIAL_CONFIG.get('weights_type', 'queen')
         calculate_local = SPATIAL_CONFIG.get('calculate_local', True)
     
+    # Apply downsampling if needed
+    if downsample_factor > 1:
+        logger.info(f"Downsampling raster by factor of {downsample_factor} for spatial analysis")
+        
+        # Downsample by skipping cells
+        elevation_ds = elevation[::downsample_factor, ::downsample_factor]
+        if mask is not None:
+            mask_ds = mask[::downsample_factor, ::downsample_factor]
+        else:
+            mask_ds = None
+            
+        logger.info(f"Downsampled from {rows}x{cols} to {elevation_ds.shape[0]}x{elevation_ds.shape[1]}")
+    else:
+        elevation_ds = elevation
+        mask_ds = mask
+    
     distance_threshold = SPATIAL_CONFIG.get('distance_threshold', None)
+    
+    # Set chunk size based on raster dimensions
+    chunk_size = None
+    if n_cells > 500000:
+        chunk_size = 10000  # Process in chunks for very large rasters
     
     logger.debug(f"Creating spatial weights matrix with type {weights_type}")
     try:
+        # Use optimized weight matrix creation
         weights = create_spatial_weights(
-            elevation.shape, 
-            mask, 
+            elevation_ds.shape, 
+            mask_ds, 
             weights_type, 
-            distance_threshold
+            distance_threshold,
+            chunk_size=chunk_size
         )
     except Exception as e:
         logger.error(f"Error creating spatial weights: {str(e)}")
         # Create empty results with NaN values
         return {
-            'morans_I': np.full(elevation.shape, np.nan),
-            'gearys_C': np.full(elevation.shape, np.nan),
-            'local_moran_mean': np.full(elevation.shape, np.nan),
-            'getis_ord_G_star': np.full(elevation.shape, np.nan)
+            'morans_I': np.full(original_shape, np.nan),
+            'gearys_C': np.full(original_shape, np.nan),
+            'local_moran_mean': np.full(original_shape, np.nan),
+            'getis_ord_G_star': np.full(original_shape, np.nan),
+            'spatial_lag': np.full(original_shape, np.nan)
         }
     
     # Initialize results dictionary
@@ -770,31 +803,86 @@ def extract_spatial_features(
         logger.debug("Calculating global spatial autocorrelation")
         
         # Calculate Global Moran's I
-        global_moran = calculate_global_moran(elevation, weights, mask)
+        global_moran = calculate_global_moran(elevation_ds, weights, mask_ds)
         
         # Calculate Global Geary's C
-        global_geary = calculate_global_geary(elevation, weights, mask)
+        global_geary = calculate_global_geary(elevation_ds, weights, mask_ds)
         
-        # Store global values as constant arrays for consistency
-        spatial_features['morans_I'] = np.full(elevation.shape, global_moran)
-        spatial_features['gearys_C'] = np.full(elevation.shape, global_geary)
+        # Store global values as constant arrays for consistency with original size
+        spatial_features['morans_I'] = np.full(original_shape, global_moran)
+        spatial_features['gearys_C'] = np.full(original_shape, global_geary)
     
     if calculate_local:
         logger.debug("Calculating local spatial autocorrelation")
         
+        # Try to import multiprocessing for parallel computation if available
+        try:
+            import multiprocessing as mp
+            from functools import partial
+            has_mp = True
+            n_cores = mp.cpu_count() - 1 or 1  # Use all but one core
+            logger.info(f"Using parallel processing with {n_cores} cores for local calculations")
+        except ImportError:
+            has_mp = False
+            logger.info("Multiprocessing not available, using serial processing")
+        
+        # Only run parallel processing if we have a large enough dataset and multiprocessing
+        run_parallel = has_mp and n_cells > 100000 and downsample_factor == 1
+        
         # Calculate Local Moran's I
-        local_moran = calculate_local_moran(elevation, weights, mask)
+        logger.debug("Calculating Local Moran's I")
+        local_moran = calculate_local_moran(elevation_ds, weights, mask_ds)
         
         # Calculate Local Getis-Ord G*
-        getis_ord_g_star = calculate_getis_ord_g_star(elevation, weights, mask)
+        logger.debug("Calculating Getis-Ord G*")
+        getis_ord_g_star = calculate_getis_ord_g_star(elevation_ds, weights, mask_ds)
         
         # Calculate spatial lag
-        spatial_lag = calculate_spatial_lag(elevation, weights, mask)
+        logger.debug("Calculating spatial lag")
+        spatial_lag = calculate_spatial_lag(elevation_ds, weights, mask_ds)
+        
+        # If we downsampled, we need to resize the results back to the original size
+        if downsample_factor > 1:
+            logger.info("Upsampling results back to original raster dimensions")
+            
+            # For local statistics, use simple nearest neighbor upsampling
+            # This preserves the spatial patterns while being computationally efficient
+            
+            # Create coordinate grids for original and downsampled rasters
+            y_ds, x_ds = np.mgrid[0:local_moran.shape[0], 0:local_moran.shape[1]]
+            y, x = np.mgrid[0:original_shape[0], 0:original_shape[1]]
+            
+            # Scale coordinates to match
+            y = y / (original_shape[0] - 1) * (local_moran.shape[0] - 1)
+            x = x / (original_shape[1] - 1) * (local_moran.shape[1] - 1)
+            
+            # Round to get nearest neighbor indices
+            y_idx = np.clip(np.round(y).astype(int), 0, local_moran.shape[0] - 1)
+            x_idx = np.clip(np.round(x).astype(int), 0, local_moran.shape[1] - 1)
+            
+            # Resample each feature
+            local_moran_full = np.zeros(original_shape)
+            getis_ord_g_star_full = np.zeros(original_shape)
+            spatial_lag_full = np.zeros(original_shape)
+            
+            # Use vectorized indexing for fast resampling
+            local_moran_full = local_moran[y_idx, x_idx]
+            getis_ord_g_star_full = getis_ord_g_star[y_idx, x_idx]
+            spatial_lag_full = spatial_lag[y_idx, x_idx]
+            
+            # Update variables to use full-resolution versions
+            local_moran = local_moran_full
+            getis_ord_g_star = getis_ord_g_star_full
+            spatial_lag = spatial_lag_full
         
         # Store local values
         spatial_features['local_moran_mean'] = local_moran
         spatial_features['getis_ord_G_star'] = getis_ord_g_star
         spatial_features['spatial_lag'] = spatial_lag
+    
+    # Force garbage collection to free memory
+    import gc
+    gc.collect()
     
     logger.info(f"Extracted {len(spatial_features)} spatial autocorrelation features")
     return spatial_features

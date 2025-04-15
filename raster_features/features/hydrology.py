@@ -295,8 +295,11 @@ def calculate_edge_detection(
     # Calculate edge magnitude
     edge = np.sqrt(dx**2 + dy**2)
     
-    # Mask invalid areas
-    edge = np.where(mask, edge, np.nan)
+    # Replace NaN values with zeros for invalid areas instead of keeping them as NaN
+    # This ensures the values are properly exported to CSV
+    edge = np.where(mask, edge, 0.0)
+    
+    logger.info(f"Edge detection calculation complete - shape: {edge.shape}, min: {np.min(edge)}, max: {np.max(edge)}, zero count: {np.sum(edge == 0)}")
     
     return edge
 

@@ -220,81 +220,91 @@ process_category() {
     local feature_dir="$4"
     local output_dir="$5"
     
-    echo -e "${BOLD}Processing ${category} features...${RESET}"
-    
-    # Construct feature CSV path
     local feature_csv="${feature_dir}/${base_name}_${category}_features.csv"
+    local feature_json="${feature_dir}/${base_name}_${category}_features.json"
+    local category_output_dir="${output_dir}/${category}"
     
-    # Check if feature file exists
+    # Check if feature CSV exists
     if [ ! -f "$feature_csv" ]; then
         warning "Feature file not found: $feature_csv"
         return 1
     fi
     
     # Create category output directory
-    local category_output="${output_dir}/${category}"
-    mkdir -p "$category_output"
+    mkdir -p "$category_output_dir"
     
-    # Set show_plots flag
-    local show_flag=""
-    if [ "$SHOW_PLOTS" = true ]; then
-        show_flag="--show"
-    fi
+    info "Processing $category features from $feature_csv"
     
-    # Set verbose flag
-    local verbose_flag=""
-    if [ "$VERBOSE" = true ]; then
-        verbose_flag="-v"
-    fi
-    
-    info "Running visualization for $category features"
-    info "Input: $feature_csv"
-    info "Output: $category_output"
-    
-    # Call the visualization module directly for basic visualizations
-    python -m raster_features.utils.visualization \
-        --raster "$raster_file" \
-        --features "$feature_csv" \
-        --output "$category_output" \
-        $show_flag
-    
-    # Create 3D visualizations if requested
-    if [ "$VISUALIZE_3D" = true ]; then
-        info "Creating 3D visualizations for $category features"
-        
-        # Create 3D output directory
-        mkdir -p "${category_output}/3d"
-        
-        # Run the 3D visualization script
-        python -m raster_features.utils.visualization_scripts.visualize_3d \
-            -r "$raster_file" \
-            -f "$feature_csv" \
-            -o "${category_output}/3d" \
-            -s "$SAMPLE_RATE" \
-            $show_flag
-    fi
-    
-    # Create interactive visualizations if requested
+    # Handle interactive visualization separately since it uses a different script
     if [ "$INTERACTIVE" = true ]; then
-        info "Creating interactive visualizations for $category features"
+        info "Creating interactive visualizations for $category"
         
-        # Create interactive output directory
-        mkdir -p "${category_output}/interactive"
-        
-        # Run the interactive visualization script
-        python -m raster_features.utils.visualization_scripts.visualize_interactive \
-            -r "$raster_file" \
-            -f "$feature_csv" \
-            -o "${category_output}/interactive" \
-            -s "$SAMPLE_RATE" \
-            $show_flag
+        # Check if plotly is installed
+        if ! python -c "import plotly" &>/dev/null; then
+            warning "Plotly is required for interactive visualizations but not found"
+            warning "Install it with: pip install plotly"
+            warning "Continuing without interactive visualizations"
+        else
+            # Create interactive directory
+            local interactive_dir="${category_output_dir}/interactive"
+            mkdir -p "$interactive_dir"
+            
+            # Build interactive visualization command
+            local interactive_cmd=(
+                "python" "-m" "raster_features.utils.visualization_scripts.visualize_interactive"
+                "-r" "$raster_file"
+                "-f" "$feature_csv"
+                "-o" "$interactive_dir"
+                "-s" "$SAMPLE_RATE"
+                "-z" "1.5"  # Default z-exaggeration factor
+            )
+            
+            # Add open flag if showing plots
+            if [ "$SHOW_PLOTS" = true ]; then
+                interactive_cmd+=("--open")
+            fi
+            
+            # Run the interactive visualization
+            info "Running: ${interactive_cmd[*]}"
+            if "${interactive_cmd[@]}"; then
+                success "Created interactive visualizations for $category"
+            else
+                warning "Failed to create interactive visualizations for $category"
+            fi
+        fi
     fi
     
-    if [ $? -eq 0 ]; then
-        success "Created visualizations for $category features in $category_output"
+    # Build static visualization command with appropriate options
+    local cmd_args=()
+    
+    # Use the new visualize-csv command from the integrated CLI
+    cmd_args+=("python" "-m" "raster_features.cli" "visualize-csv")
+    cmd_args+=("--csv" "$feature_csv")
+    cmd_args+=("--output" "$category_output_dir")
+    
+    # Add 3D visualization if requested
+    if [ "$VISUALIZE_3D" = true ]; then
+        cmd_args+=("--create-3d")
+        cmd_args+=("--sample-rate" "$SAMPLE_RATE")
+    fi
+    
+    # Add show plots option if requested
+    if [ "$SHOW_PLOTS" = true ]; then
+        cmd_args+=("--show-plots")
+    fi
+    
+    # Add verbose output if requested
+    if [ "$VERBOSE" = true ]; then
+        cmd_args+=("--verbose")
+    fi
+    
+    # Run the visualization command
+    info "Running: ${cmd_args[*]}"
+    if "${cmd_args[@]}"; then
+        success "Visualized $category features"
         return 0
     else
-        warning "Failed to create visualizations for $category features"
+        warning "Failed to visualize $category features"
         return 1
     fi
 }
@@ -350,7 +360,7 @@ compare_features() {
                 feature_columns+=("${base_name}_${category}_features:moran_i")
                 ;;
             "texture")
-                feature_columns+=("${base_name}_${category}_features:contrast")
+                feature_columns+=("${base_name}_${category}_features:glcm_contrast")
                 ;;
             "spectral")
                 feature_columns+=("${base_name}_${category}_features:fft_peak")

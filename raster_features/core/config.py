@@ -73,27 +73,28 @@ SPECTRAL_CONFIG: Dict[str, Any] = {
     "calculate_fft": True,
     "fft_window_function": "hann", # Window function for FFT ("hann", "hamming", "blackman", etc.)
     "calculate_wavelets": True,
-    "wavelet_name": "db4",
-    "decomposition_level": 2,    # Reduced from 3 to 2 for better performance
-    "wavelet_energy_mode": "energy", # Options: "energy", "entropy", "variance"
+    "wavelet_type": "db4",
+    "wavelet_level": 3,    # Increased to 3 for better feature extraction
+    "energy_mode": "energy", # Options: "energy", "entropy", "variance"
     "calculate_multiscale_entropy": True,
-    "multiscale_entropy_scales": [2, 4, 8],  # Removed larger scale 16
+    "mse_scales": [2, 4, 8, 16],  # Added back larger scale 16
+    "mse_window_size": 32,  # Larger window for better entropy estimation
     
     # Local spectral features (spatially varying)
     "calculate_local_fft": True,  # Local FFT provides valuable spatial information
     "local_fft_window_size": 16,  # Power of 2 for efficient FFT
     
-    "calculate_local_wavelets": False, # Disabled for performance (most compute-intensive)
-    "local_wavelet_name": "db4",
-    "local_decomposition_level": 1,  # Minimal level if enabled
-    "local_wavelet_energy_mode": "energy",
-    "local_wavelet_window_size": 16,  # Smaller window size
+    "calculate_local_wavelets": True, # Enabled for richer feature extraction
+    "local_wavelet_type": "db4",
+    "local_wavelet_level": 2,  # Increased level for better features
+    "local_wavelet_window": 32,  # Larger window for better analysis
     
     "calculate_local_mse": True,   # Enabled for spatial variability
-    "local_mse_scales": [2, 4],    # Only smallest scales for better performance
-    "local_mse_window_size": 16,   # Smaller window size
+    "local_mse_scales": [2, 4, 8],  # Added scale 8 for better features
+    "local_mse_window": 32,   # Larger window size for better entropy estimation
     
-    "export_intermediate": False,   # Export intermediate results (coefficient maps)
+    "export_intermediate_wavelets": True,   # Export intermediate results (coefficient maps)
+    "max_memory_mb": 4000,  # Default 4GB memory limit
 }
 
 # Hydrological feature configuration

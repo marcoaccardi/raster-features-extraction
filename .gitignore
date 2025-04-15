@@ -2,3 +2,7 @@
 **/__pycache__
 /dataset
 /FKt231024_M3_dataset
+/visualizations
+/qgis_sonification_pipeline/output
+**/.cache
+/raster_features/core/output

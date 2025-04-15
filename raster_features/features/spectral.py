@@ -24,10 +24,11 @@ logger = get_module_logger(__name__)
 def calculate_fft_features(
     elevation: np.ndarray,
     mask: Optional[np.ndarray] = None,
-    window_function: str = 'hann'
+    window_function: str = 'hann',
+    local_window_size: int = 16
 ) -> Dict[str, np.ndarray]:
     """
-    Calculate FFT-based spectral features.
+    Calculate FFT-based spectral features on a per-pixel basis using a moving window.
     
     Parameters
     ----------
@@ -38,6 +39,8 @@ def calculate_fft_features(
     window_function : str, optional
         Window function to use to reduce edge effects, by default 'hann'.
         Options: 'hann', 'hamming', 'blackman', etc.
+    local_window_size : int, optional
+        Size of the local window to use for per-pixel FFT calculation, by default 16.
         
     Returns
     -------
@@ -47,69 +50,101 @@ def calculate_fft_features(
     if mask is None:
         mask = np.ones_like(elevation, dtype=bool)
     
-    logger.debug("Calculating FFT features")
+    logger.debug("Calculating FFT features using local windows")
     
-    # Make a copy with zeros for invalid cells (better for FFT than NaN)
-    elev_valid = np.where(mask, elevation, 0)
+    # Initialize output arrays
+    fft_peak = np.zeros_like(elevation, dtype=np.float32)
+    fft_mean = np.zeros_like(elevation, dtype=np.float32)
+    fft_entropy = np.zeros_like(elevation, dtype=np.float32)
     
-    # Apply window function to reduce edge effects
+    # Create a padded array to handle edge effects
+    pad_size = local_window_size // 2
+    elev_padded = np.pad(elevation, pad_size, mode='reflect')
+    mask_padded = np.pad(mask, pad_size, mode='constant', constant_values=False)
+    
+    # Create window function once (for efficiency)
     try:
-        window = signal.get_window(window_function, elev_valid.shape[0])[:, np.newaxis] * \
-                 signal.get_window(window_function, elev_valid.shape[1])
+        window = signal.get_window(window_function, local_window_size)[:, np.newaxis] * \
+                 signal.get_window(window_function, local_window_size)
     except Exception as e:
         logger.warning(f"Error creating window function '{window_function}', falling back to hann: {str(e)}")
-        window = signal.windows.hann(elev_valid.shape[0])[:, np.newaxis] * signal.windows.hann(elev_valid.shape[1])
-        
-    elev_windowed = elev_valid * window
+        window = signal.windows.hann(local_window_size)[:, np.newaxis] * signal.windows.hann(local_window_size)
     
-    try:
-        # Calculate 2D FFT
-        f = fft2(elev_windowed)
-        f_shifted = fftshift(f)
-        f_abs = np.abs(f_shifted)
-        
-        # Normalize by number of pixels for consistent scaling
-        f_abs /= (elevation.shape[0] * elevation.shape[1])
-        
-        # Extract peak frequency
-        peak_idx = np.unravel_index(np.argmax(f_abs), f_abs.shape)
-        center = (f_abs.shape[0] // 2, f_abs.shape[1] // 2)
-        
-        # Calculate distance from center (peak frequency)
-        peak_freq = np.sqrt((peak_idx[0] - center[0])**2 + (peak_idx[1] - center[1])**2)
-        
-        # Normalize to 0-1 range based on maximum possible distance
-        max_dist = np.sqrt(center[0]**2 + center[1]**2)
-        norm_peak_freq = peak_freq / max_dist if max_dist > 0 else 0
-        
-        # Calculate mean spectrum
-        mean_spectrum = np.mean(f_abs)
-        
-        # Calculate spectral entropy
-        # Normalize spectrum for entropy calculation
-        f_norm = f_abs / np.sum(f_abs)
-        spec_entropy = shannon_entropy(f_norm)
-        
-        # Create constant arrays with feature values
-        fft_features = {
-            'fft_peak': np.full_like(elevation, norm_peak_freq),
-            'fft_mean': np.full_like(elevation, mean_spectrum),
-            'fft_entropy': np.full_like(elevation, spec_entropy)
-        }
-        
-        # Mask invalid areas
-        for key in fft_features:
-            fft_features[key] = np.where(mask, fft_features[key], np.nan)
-        
-        return fft_features
+    # Calculate center of frequency domain for peak detection
+    center = (local_window_size // 2, local_window_size // 2)
+    max_dist = np.sqrt(center[0]**2 + center[1]**2)
     
-    except Exception as e:
-        logger.warning(f"Error calculating FFT features: {str(e)}")
-        return {
-            'fft_peak': np.full_like(elevation, np.nan),
-            'fft_mean': np.full_like(elevation, np.nan),
-            'fft_entropy': np.full_like(elevation, np.nan)
-        }
+    # Process each valid pixel with a moving window
+    height, width = elevation.shape
+    for i in range(height):
+        for j in range(width):
+            if not mask[i, j]:
+                continue
+            
+            # Extract local window
+            i_pad = i + pad_size
+            j_pad = j + pad_size
+            window_data = elev_padded[i_pad-pad_size:i_pad+pad_size, j_pad-pad_size:j_pad+pad_size]
+            window_mask = mask_padded[i_pad-pad_size:i_pad+pad_size, j_pad-pad_size:j_pad+pad_size]
+            
+            # Skip if not enough valid data in window
+            valid_percentage = np.sum(window_mask) / window_mask.size
+            if valid_percentage < 0.5:  # Threshold for valid data percentage
+                continue
+            
+            # Apply window function and handling for invalid pixels
+            window_valid = np.where(window_mask, window_data, 0) * window
+            
+            try:
+                # Calculate 2D FFT
+                f = fft2(window_valid)
+                f_shifted = fftshift(f)
+                f_abs = np.abs(f_shifted)
+                
+                # Normalize by window size for consistent scaling
+                f_abs /= window_valid.size
+                
+                # Extract peak frequency
+                peak_idx = np.unravel_index(np.argmax(f_abs), f_abs.shape)
+                
+                # Calculate distance from center (peak frequency)
+                peak_freq = np.sqrt((peak_idx[0] - center[0])**2 + (peak_idx[1] - center[1])**2)
+                
+                # Normalize to 0-1 range
+                norm_peak_freq = peak_freq / max_dist if max_dist > 0 else 0
+                
+                # Calculate mean spectrum
+                mean_spectrum = np.mean(f_abs)
+                
+                # Calculate spectral entropy
+                # Normalize spectrum for entropy calculation
+                f_sum = np.sum(f_abs)
+                if f_sum > 0:
+                    f_norm = f_abs / f_sum
+                    spec_entropy = shannon_entropy(f_norm)
+                else:
+                    spec_entropy = 0
+                
+                # Store feature values for this pixel
+                fft_peak[i, j] = norm_peak_freq
+                fft_mean[i, j] = mean_spectrum
+                fft_entropy[i, j] = spec_entropy
+                
+            except Exception as e:
+                logger.debug(f"Error calculating FFT at position ({i},{j}): {str(e)}")
+    
+    # Create results dictionary
+    fft_features = {
+        'fft_peak': fft_peak,
+        'fft_mean': fft_mean,
+        'fft_entropy': fft_entropy
+    }
+    
+    # Mask invalid areas
+    for key in fft_features:
+        fft_features[key] = np.where(mask, fft_features[key], 0)
+    
+    return fft_features
 
 
 def calculate_local_fft_features(
@@ -564,10 +599,11 @@ def calculate_local_wavelet_features(
 def calculate_multiscale_entropy(
     elevation: np.ndarray,
     mask: Optional[np.ndarray] = None,
-    scales: List[int] = [2, 4, 8, 16]
+    scales: List[int] = [2, 4, 8, 16],
+    window_size: int = 32
 ) -> Dict[str, np.ndarray]:
     """
-    Calculate multiscale entropy.
+    Calculate multiscale entropy on a per-pixel basis using a moving window.
     
     Parameters
     ----------
@@ -577,6 +613,8 @@ def calculate_multiscale_entropy(
         Boolean mask of valid data, by default None.
     scales : list, optional
         List of scales for coarse-graining, by default [2, 4, 8, 16].
+    window_size : int, optional
+        Size of the local window to use for per-pixel calculation, by default 32.
         
     Returns
     -------
@@ -586,102 +624,111 @@ def calculate_multiscale_entropy(
     if mask is None:
         mask = np.ones_like(elevation, dtype=bool)
     
-    logger.debug(f"Calculating multiscale entropy at scales {scales}")
+    logger.debug(f"Calculating multiscale entropy at scales {scales} using local windows")
     
-    # Make a copy with NaN for invalid cells
-    elev_nan = np.where(mask, elevation, np.nan)
-    
-    # Initialize features dictionary
+    # Initialize output arrays
     mse_features = {}
+    mse_values = {}
     
-    try:
-        # Original entropy (scale 1)
-        original_entropy = shannon_entropy(normalize_array(elev_nan))
-        mse_features['multiscale_entropy_1'] = np.full_like(elevation, original_entropy)
-        
-        # Calculate entropy at each scale
-        for scale in scales:
-            # Skip scales larger than the smaller dimension
-            if scale >= min(elevation.shape):
+    # Create arrays for each scale
+    for scale in [1] + scales:
+        mse_values[scale] = np.zeros_like(elevation, dtype=np.float32)
+    
+    # Add slope array
+    mse_slope = np.zeros_like(elevation, dtype=np.float32)
+    
+    # Create a padded array to handle edge effects
+    pad_size = window_size // 2
+    elev_padded = np.pad(elevation, pad_size, mode='reflect')
+    mask_padded = np.pad(mask, pad_size, mode='constant', constant_values=False)
+    
+    # Process each valid pixel with a moving window
+    height, width = elevation.shape
+    for i in range(height):
+        for j in range(width):
+            if not mask[i, j]:
                 continue
             
-            # Coarse-grain the data by averaging non-overlapping windows
-            # Use valid_mean to handle NaN values
-            def valid_mean(x):
-                valid = x[~np.isnan(x)]
-                return np.mean(valid) if len(valid) > 0 else np.nan
+            # Extract local window
+            i_pad = i + pad_size
+            j_pad = j + pad_size
+            window_data = elev_padded[i_pad-pad_size:i_pad+pad_size, j_pad-pad_size:j_pad+pad_size]
+            window_mask = mask_padded[i_pad-pad_size:i_pad+pad_size, j_pad-pad_size:j_pad+pad_size]
             
-            # Apply coarse-graining using block_reduce
+            # Skip if not enough valid data in window
+            valid_percentage = np.sum(window_mask) / window_mask.size
+            if valid_percentage < 0.5:  # Threshold for valid data percentage
+                continue
+            
             try:
-                # Use skimage's view_as_blocks for coarse-graining
-                from skimage.util import view_as_blocks
+                # Create a masked array for the window
+                window_masked = np.ma.array(window_data, mask=~window_mask)
                 
-                # Ensure array dimensions are multiples of scale
-                pad_rows = (0 if elevation.shape[0] % scale == 0 
-                           else scale - elevation.shape[0] % scale)
-                pad_cols = (0 if elevation.shape[1] % scale == 0 
-                           else scale - elevation.shape[1] % scale)
+                # Calculate original entropy (scale 1)
+                normalized_window = normalize_array(window_masked)
+                if normalized_window is not None:
+                    original_entropy = shannon_entropy(normalized_window)
+                    mse_values[1][i, j] = original_entropy
                 
-                if pad_rows > 0 or pad_cols > 0:
-                    elev_padded = np.pad(
-                        elev_nan, 
-                        ((0, pad_rows), (0, pad_cols)), 
-                        mode='constant', 
-                        constant_values=np.nan
+                # Calculate entropy at each scale
+                scale_entropies = []
+                log_scales = []
+                
+                for scale in scales:
+                    # Skip if window is too small for this scale
+                    if window_size < scale * 2:
+                        continue
+                    
+                    # Perform coarse-graining by averaging non-overlapping blocks
+                    # First reshape to chunks
+                    scale_window = window_masked.copy()
+                    
+                    # Simple coarse-graining for irregular window
+                    coarse_grained = ndimage.uniform_filter(
+                        scale_window.filled(np.nan), 
+                        size=scale,
+                        mode='constant',
+                        cval=np.nan
                     )
-                else:
-                    elev_padded = elev_nan
+                    
+                    # Normalize and calculate entropy
+                    normalized_coarse = normalize_array(np.ma.masked_invalid(coarse_grained))
+                    if normalized_coarse is not None:
+                        scale_entropy = shannon_entropy(normalized_coarse)
+                        mse_values[scale][i, j] = scale_entropy
+                        
+                        # Save for slope calculation
+                        scale_entropies.append(scale_entropy)
+                        log_scales.append(np.log2(scale))
                 
-                # Reshape to blocks
-                blocks = view_as_blocks(elev_padded, (scale, scale))
-                
-                # Calculate mean of each block
-                coarse_grained = np.zeros((blocks.shape[0], blocks.shape[1]))
-                for i in range(blocks.shape[0]):
-                    for j in range(blocks.shape[1]):
-                        coarse_grained[i, j] = valid_mean(blocks[i, j])
-                
-            except ImportError:
-                # Fallback method if skimage.util.view_as_blocks is not available
-                rows, cols = elevation.shape
-                coarse_rows = rows // scale
-                coarse_cols = cols // scale
-                coarse_grained = np.zeros((coarse_rows, coarse_cols))
-                
-                for i in range(coarse_rows):
-                    for j in range(coarse_cols):
-                        window = elev_nan[i*scale:(i+1)*scale, j*scale:(j+1)*scale]
-                        coarse_grained[i, j] = valid_mean(window)
-            
-            # Calculate entropy of coarse-grained data
-            mse = shannon_entropy(normalize_array(coarse_grained))
-            mse_features[f'multiscale_entropy_{scale}'] = np.full_like(elevation, mse)
-        
-        # Calculate multiscale entropy slope (trend across scales)
-        scales_used = [1] + [s for s in scales if s < min(elevation.shape)]
-        entropies = [mse_features[f'multiscale_entropy_{s}'][0, 0] for s in scales_used]
-        
-        if len(scales_used) >= 2:
-            # Calculate slope using linear regression
-            log_scales = np.log(scales_used)
-            coeffs = np.polyfit(log_scales, entropies, 1)
-            slope = coeffs[0]
-            
-            # Add slope as a feature
-            mse_features['multiscale_entropy_slope'] = np.full_like(elevation, slope)
-        
-        # Mask invalid areas
-        for key in mse_features:
-            mse_features[key] = np.where(mask, mse_features[key], np.nan)
-        
-        return mse_features
+                # Calculate entropy slope if we have multiple scales
+                if len(scale_entropies) > 1:
+                    # Use linear regression to find slope
+                    try:
+                        slope, _ = np.polyfit(log_scales, scale_entropies, 1)
+                        mse_slope[i, j] = slope
+                    except Exception:
+                        pass
+                        
+            except Exception as e:
+                logger.debug(f"Error calculating multiscale entropy at ({i}, {j}): {str(e)}")
     
-    except Exception as e:
-        logger.warning(f"Error calculating multiscale entropy: {str(e)}")
-        return {
-            'multiscale_entropy_1': np.full_like(elevation, np.nan),
-            'multiscale_entropy_slope': np.full_like(elevation, np.nan)
-        }
+    # Create features dictionary
+    mse_features['multiscale_entropy_1'] = mse_values[1]
+    
+    # Add entropy at each scale
+    for scale in scales:
+        if scale in mse_values:
+            mse_features[f'multiscale_entropy_{scale}'] = mse_values[scale]
+    
+    # Add slope feature
+    mse_features['multiscale_entropy_slope'] = mse_slope
+    
+    # Mask invalid areas
+    for key in mse_features:
+        mse_features[key] = np.where(mask, mse_features[key], 0)
+    
+    return mse_features
 
 
 def calculate_local_multiscale_entropy(
@@ -830,7 +877,8 @@ def extract_spectral_features(
     if SPECTRAL_CONFIG.get('calculate_fft', True):
         logger.debug("Calculating FFT features")
         fft_features = calculate_fft_features(elevation, mask, 
-                                             window_function=SPECTRAL_CONFIG.get('fft_window_function', 'hann'))
+                                             window_function=SPECTRAL_CONFIG.get('fft_window_function', 'hann'),
+                                             local_window_size=SPECTRAL_CONFIG.get('fft_local_window_size', 16))
         spectral_features.update(fft_features)
         
         # Local FFT features (optional)
@@ -881,7 +929,8 @@ def extract_spectral_features(
         
         mse_features = calculate_multiscale_entropy(
             elevation, mask, 
-            scales=scales
+            scales=scales,
+            window_size=SPECTRAL_CONFIG.get('multiscale_entropy_window_size', 32)
         )
         spectral_features.update(mse_features)
         
@@ -900,3 +949,120 @@ def extract_spectral_features(
     
     logger.info(f"Extracted {len(spectral_features)} spectral features")
     return spectral_features
+
+def extract_spectral_features_fallback(
+    elevation: np.ndarray,
+    mask: Optional[np.ndarray] = None
+) -> Dict[str, np.ndarray]:
+    """
+    Simple fallback implementation for spectral features that doesn't rely on external dependencies.
+    Calculates basic frequency domain approximations using spatial gradients.
+    
+    Parameters
+    ----------
+    elevation : np.ndarray
+        2D array of elevation values
+    mask : np.ndarray, optional
+        2D boolean mask of valid data
+        
+    Returns
+    -------
+    dict
+        Dictionary with basic spectral features
+    """
+    if mask is None:
+        mask = np.ones_like(elevation, dtype=bool)
+        
+    logger.info("Calculating basic spectral features using fallback method")
+    
+    # Initialize output arrays
+    features = {}
+    
+    # Calculate basic variation metrics as approximations of spectral properties
+    # Standard deviation in neighborhood
+    std_feature = np.zeros_like(elevation)
+    
+    # Initialize gradient features
+    grad_x = np.zeros_like(elevation)
+    grad_y = np.zeros_like(elevation)
+    grad_mag = np.zeros_like(elevation)
+    laplacian = np.zeros_like(elevation)
+    
+    # Create a padded array to handle edge effects
+    pad_size = 2
+    elev_padded = np.pad(elevation, pad_size, mode='reflect')
+    mask_padded = np.pad(mask, pad_size, mode='constant', constant_values=False)
+    
+    # Process each valid pixel with a 5x5 window
+    height, width = elevation.shape
+    for i in range(height):
+        for j in range(width):
+            if not mask[i, j]:
+                continue
+            
+            # Extract local 5x5 window
+            i_pad = i + pad_size
+            j_pad = j + pad_size
+            window = elev_padded[i_pad-2:i_pad+3, j_pad-2:j_pad+3]
+            window_mask = mask_padded[i_pad-2:i_pad+3, j_pad-2:j_pad+3]
+            
+            # Skip if not enough valid data in window
+            valid_count = np.sum(window_mask)
+            if valid_count < 13:  # At least half the window should be valid
+                continue
+            
+            # Create masked array
+            window_masked = np.ma.array(window, mask=~window_mask)
+            
+            # Calculate standard deviation (approximates frequency content)
+            std_feature[i, j] = np.ma.std(window_masked)
+            
+            # Calculate x and y gradients using central difference
+            if window_mask[2, 1] and window_mask[2, 3]:
+                grad_x[i, j] = (window[2, 3] - window[2, 1]) / 2
+            
+            if window_mask[1, 2] and window_mask[3, 2]:
+                grad_y[i, j] = (window[3, 2] - window[1, 2]) / 2
+            
+            # Calculate gradient magnitude (approximates high frequencies)
+            grad_mag[i, j] = np.sqrt(grad_x[i, j]**2 + grad_y[i, j]**2)
+            
+            # Calculate Laplacian (approximates second derivative/high frequencies)
+            if (window_mask[1, 2] and window_mask[2, 1] and 
+                window_mask[2, 3] and window_mask[3, 2] and window_mask[2, 2]):
+                laplacian[i, j] = (window[1, 2] + window[2, 1] + window[2, 3] + 
+                                  window[3, 2] - 4 * window[2, 2])
+    
+    # Package features
+    features['spectral_basic_std'] = std_feature
+    features['spectral_basic_grad_x'] = grad_x
+    features['spectral_basic_grad_y'] = grad_y
+    features['spectral_basic_grad_mag'] = grad_mag
+    features['spectral_basic_laplacian'] = laplacian
+    
+    # Additional spectral approximation: local frequency variation
+    # Use a larger window and calculate the ratio of high to low frequencies
+    # via standard deviation at different scales
+    small_window = ndimage.uniform_filter(np.where(mask, elevation, 0), size=3)
+    large_window = ndimage.uniform_filter(np.where(mask, elevation, 0), size=9)
+    
+    # Calculate standard deviation ratio (high/low frequency proxy)
+    small_std = ndimage.generic_filter(
+        np.where(mask, elevation, 0), np.std, size=3, mode='reflect'
+    )
+    large_std = ndimage.generic_filter(
+        np.where(mask, elevation, 0), np.std, size=9, mode='reflect'
+    )
+    
+    # Calculate high-to-low frequency ratio (avoid division by zero)
+    freq_ratio = np.zeros_like(elevation)
+    valid_mask = (large_std > 0) & mask
+    freq_ratio[valid_mask] = small_std[valid_mask] / large_std[valid_mask]
+    
+    features['spectral_basic_freq_ratio'] = freq_ratio
+    
+    # Mask invalid areas
+    for key in features:
+        features[key] = np.where(mask, features[key], 0)
+    
+    return features
